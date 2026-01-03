@@ -16,6 +16,9 @@ require_once ADVANCED_AJAX_CRUD_PATH . 'includes/ajax-handlers.php';
 require_once ADVANCED_AJAX_CRUD_PATH . 'includes/shortcodes.php';
 require_once ADVANCED_AJAX_CRUD_PATH . 'includes/helpers.php';
 
+// Register activation hook
+register_activation_hook(__FILE__, 'advanced_ajax_crud_create_table');
+
 /**
  * Assets
  */
