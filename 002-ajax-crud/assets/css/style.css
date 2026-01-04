@@ -1,0 +1,12 @@
+#ajax-toast {
+    position: fixed;
+    right: 20px;
+    top: 20px;
+    padding: 12px 18px;
+    background: #2ecc71;
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    display: none;
+    z-index: 9999;
+}
