@@ -4,25 +4,22 @@ jQuery(function ($) {
         let lastname = $("#lastname").val();
         let job_title = $("#job_title").val();
 
-        $.post(
-            advancedAjaxCrud.advanced_ajax_url,
-            {
-                action: "advanced_ajax_crud_add_employee",
-                firstname: firstname,
-                lastname: lastname,
-                job_title: job_title,
-                nonce: advancedAjaxCrud.nonce,
-            },
-            function (response) {
-                // Reset Form
+        $.post(advancedAjaxCrud.advanced_ajax_url, {
+            action: "advanced_ajax_crud_add_employee",
+            firstname: firstname,
+            lastname: lastname,
+            job_title: job_title,
+            nonce: advancedAjaxCrud.nonce,
+        })
+            .done((response) => {
                 $("#firstname").val("");
                 $("#lastname").val("");
                 $("#job_title").val("");
-
-                showToast(response.data);
-                loadItems();
-            }
-        );
+                showToast(response.data.message);
+            })
+            .fail((response) => {
+                showToast(response.responseJSON.data.message);
+            });
     });
 
     // Helper for notification
