@@ -10,3 +10,18 @@
     display: none;
     z-index: 9999;
 }
+
+.advanced-ajax-crud-employee-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.advanced-ajax-crud-employee-table th,
+.advanced-ajax-crud-employee-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+#cancelEditEmployee {
+    display: none;
+}
