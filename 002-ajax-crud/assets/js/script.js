@@ -26,7 +26,7 @@ jQuery(function ($) {
                             <td>${employee.created_at}</td>
                             <td>
                                 <button class="ajax-crud-employee-edit" data-id="${employee.id}">Edit</button>
-                                <button class="ajax-crud-delete" data-id="${employee.id}">Delete</button>
+                                <button class="ajax-crud-employee-delete" data-id="${employee.id}">Delete</button>
                             </td>
                             </tr>`;
                 });
@@ -95,6 +95,42 @@ jQuery(function ($) {
         $("#firstname").val("");
         $("#lastname").val("");
         $("#job_title").val("");
+    });
+
+    // * Delete Employee
+    $(document).on("click", ".ajax-crud-employee-delete", function () {
+        const id = $(this).closest("tr").data("id");
+
+        $("#advanced-ajax-crud-employee-id").val(id);
+        $("#advanced-ajax-crud-employee-delete-modal").fadeIn(150);
+    });
+
+    $("#advanced-ajax-crud-cancel, .advanced-ajax-crud-employee-modal-backdrop").on("click", function () {
+        $("#advanced-ajax-crud-employee-delete-modal").fadeOut(150);
+    });
+
+    $(document).on("click", "#advanced-ajax-crud-delete", function (e) {
+        e.preventDefault();
+        const btn = $(this).prop("disabled", true);
+
+        $.post(advancedAjaxCrud.advanced_ajax_url, {
+            action: "advanced_ajax_crud_delete_employee",
+            nonce: advancedAjaxCrud.nonce,
+            id: $("#advanced-ajax-crud-employee-id").val(),
+        })
+            .done((response) => {
+                showToast(response.data.message);
+                loadEmployees();
+                $("#advanced-ajax-crud-employee-delete-modal").fadeOut(150);
+            })
+            .fail((response) => {
+                showToast(response.data.message);
+                loadEmployees();
+                $("#advanced-ajax-crud-employee-delete-modal").fadeOut(150);
+            })
+            .always(() => {
+                btn.prop("disabled", false);
+            });
     });
 
     // Helper for notification

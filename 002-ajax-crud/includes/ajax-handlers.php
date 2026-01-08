@@ -27,11 +27,11 @@ function advanced_ajax_crud_employee_list()
     wp_send_json_success($employees);
 }
 
-// * Add (Insert Employee Data)
-add_action('wp_ajax_advanced_ajax_crud_add_employee', 'advanced_ajax_crud_add_employee');
-add_action('wp_ajax_nopriv_advanced_ajax_crud_add_employee', 'advanced_ajax_crud_add_employee'); // allow guests if desired
+// * Add/Edit (Insert/Update Employee Data)
+add_action('wp_ajax_advanced_ajax_crud_add_employee', 'advanced_ajax_crud_add_employee_callback');
+add_action('wp_ajax_nopriv_advanced_ajax_crud_add_employee', 'advanced_ajax_crud_add_employee_callback'); // allow guests if desired
 
-function advanced_ajax_crud_add_employee()
+function advanced_ajax_crud_add_employee_callback()
 {
     advanced_ajax_crud_require_auth_capability();
     advanced_ajax_crud_verify_nonce();
@@ -83,12 +83,14 @@ function advanced_ajax_crud_add_employee()
             ['%d']
         );
 
-        if (!$updated) {
+        if ($updated === false) {
             wp_send_json_error([
                 'message' => 'Database insert/update failed',
                 'error'   => $wpdb->last_error,
             ], 500);
             return;
+        } else {
+            $message = 'Updated successfully';
         }
     } else {
 
@@ -101,24 +103,45 @@ function advanced_ajax_crud_add_employee()
             ],
             ['%s', '%s', '%s']
         );
-        wp_send_json_success(['message' => 'inserting xx']);
-        return;
 
-        if (!$inserted) {
+        if ($inserted === false) {
             wp_send_json_error([
                 'message' => 'Database insert/update failed',
                 'error'   => $wpdb->last_error,
             ], 500);
             return;
+        } else {
+            $message = 'Added successfully.';
         }
     }
 
     wp_send_json_success([
-        'message'       =>  'Employee added',
         'id'            =>  $wpdb->insert_id,
         'firstname'       =>  'firstname',
         'lastname'       =>  'lastname',
         'job_title'       =>  'job_title',
-        'message'       =>  'Employee added',
+        'message'       =>  $message,
     ]);
+}
+
+// * Delete (Delete Employee Data)
+add_action('wp_ajax_advanced_ajax_crud_delete_employee', 'advanced_ajax_crud_delete_employee_callback');
+add_action('wp_ajax_nopriv_advanced_ajax_crud_delete_employee', 'advanced_ajax_crud_delete_employee_callback'); // allow guests if desired
+
+function advanced_ajax_crud_delete_employee_callback()
+{
+    advanced_ajax_crud_require_auth_capability();
+    advanced_ajax_crud_verify_nonce();
+
+    global $wpdb;
+    $id   = intval($_POST['id']);
+
+    $deleted = $wpdb->delete(ADVANCED_AJAX_CRUD_TABLE, ['id' => $id]);
+
+    if (!$deleted) {
+        wp_send_json_error(['message' => 'something went wrong']);
+        return;
+    }
+
+    wp_send_json_success(['message' => 'Deleted successfully.']);
 }

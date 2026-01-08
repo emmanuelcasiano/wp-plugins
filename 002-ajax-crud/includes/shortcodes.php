@@ -9,6 +9,28 @@ add_shortcode('advanced_ajax_crud_employee_list', function () {
         <p>Loading Employees...</p>
     </div>
 
+
+    <!-- Delete Modal -->
+    <div id="advanced-ajax-crud-employee-delete-modal" style="display: none;">
+        <div class="advanced-ajax-crud-employee-modal-backdrop"></div>
+
+        <div class="advanced-ajax-crud-employee-modal">
+            <h2>Delete Employee</h2>
+
+            <p id="advanced-ajax-crud-employee-delete-text">
+                Are you sure you want to delete this employee?
+            </p>
+
+            <input type="hidden" id="advanced-ajax-crud-employee-id">
+
+            <div class="advanced-ajax-crud-employee-modal-actions">
+                <button id="advanced-ajax-crud-delete" class="button button-primary">Delete Permanently</button>
+                <button id="advanced-ajax-crud-cancel" class="button">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+
 <?php return ob_get_clean();
 });
 
