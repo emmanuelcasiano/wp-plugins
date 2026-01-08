@@ -1,8 +1,12 @@
 jQuery(function ($) {
     // * Load Employees
-    function loadEmployees() {
+    let currentPage = 1;
+    function loadEmployees(page = 1) {
+        currentPage = page;
+
         $.post(advancedAjaxCrud.advanced_ajax_url, {
             action: "advanced_ajax_crud_employee_list",
+            page: page,
         })
             .done((response) => {
                 let html = '<table class="advanced-ajax-crud-employee-table">';
@@ -16,7 +20,7 @@ jQuery(function ($) {
                             <th>Actions</th>
                         </tr>`;
 
-                response.data.forEach((employee) => {
+                response.data.employees.forEach((employee) => {
                     html += `
                             <tr data-id="${employee.id}">
                             <td>${employee.id}</td>
@@ -34,12 +38,47 @@ jQuery(function ($) {
                 html += "</table>";
 
                 jQuery("#advanced-ajax-crud-employee-list").html(html);
+                renderPagination(response.data);
             })
             .fail((response) => {
                 showToast(response.responseJSON.data.message);
             });
     }
-    loadEmployees();
+    loadEmployees(currentPage);
+
+    // * Pagination Renderer
+    function renderPagination(data) {
+        const wrapper = $("#aaec-pagination");
+        wrapper.empty();
+
+        if (data.total_pages <= 1) return;
+
+        // Prev
+        if (data.current > 1) {
+            wrapper.append(`<button class="button aaec-page" data-page="${data.current - 1}">« Prev</button>`);
+        }
+
+        // Pages
+        for (let i = 1; i <= data.total_pages; i++) {
+            wrapper.append(`
+            <button
+                class="button aaec-page ${i === data.current ? "button-primary" : ""}"
+                data-page="${i}">
+                ${i}
+            </button>
+        `);
+        }
+
+        // Next
+        if (data.current < data.total_pages) {
+            wrapper.append(`<button class="button aaec-page" data-page="${data.current + 1}">Next »</button>`);
+        }
+    }
+
+    // * Pagination Click Handler
+    $(document).on("click", ".aaec-page", function () {
+        loadEmployees($(this).data("page"));
+    });
 
     // * Add Employee
     $("#addEmployee").on("click", function () {
@@ -65,7 +104,11 @@ jQuery(function ($) {
                 $("#cancelEditEmployee").hide();
 
                 showToast(response.data.message);
-                loadEmployees();
+                if (id) {
+                    loadEmployees(currentPage);
+                } else {
+                    loadEmployees();
+                }
             })
             .fail((response) => {
                 showToast(response.responseJSON.data.message);
@@ -120,16 +163,14 @@ jQuery(function ($) {
         })
             .done((response) => {
                 showToast(response.data.message);
-                loadEmployees();
-                $("#advanced-ajax-crud-employee-delete-modal").fadeOut(150);
             })
             .fail((response) => {
                 showToast(response.data.message);
-                loadEmployees();
-                $("#advanced-ajax-crud-employee-delete-modal").fadeOut(150);
             })
             .always(() => {
                 btn.prop("disabled", false);
+                $("#advanced-ajax-crud-employee-delete-modal").fadeOut(150);
+                loadEmployees(currentPage);
             });
     });
 

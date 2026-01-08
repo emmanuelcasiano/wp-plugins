@@ -8,6 +8,7 @@ add_shortcode('advanced_ajax_crud_employee_list', function () {
     <div id="advanced-ajax-crud-employee-list">
         <p>Loading Employees...</p>
     </div>
+    <div id="aaec-pagination" style="margin-top:15px;"></div>
 
 
     <!-- Delete Modal -->

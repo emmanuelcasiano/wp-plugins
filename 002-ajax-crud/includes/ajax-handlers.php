@@ -9,10 +9,22 @@ function advanced_ajax_crud_employee_list()
 {
     global $wpdb;
 
+    $per_page = 5;
+    $page     = max(1, intval($_POST['page'] ?? 1));
+    $offset   = ($page - 1) * $per_page;
+
+    // Total rows (excluding archived if you use soft delete)
+    $total = (int) $wpdb->get_var("SELECT COUNT(*) FROM " . ADVANCED_AJAX_CRUD_TABLE);
+
     $employees = $wpdb->get_results(
-        "SELECT id, firstname, lastname, job_title, created_at
-        FROM " . ADVANCED_AJAX_CRUD_TABLE . "
-        ORDER BY created_at DESC",
+        $wpdb->prepare(
+            "SELECT id, firstname, lastname, job_title, created_at
+            FROM " . ADVANCED_AJAX_CRUD_TABLE . "
+            ORDER BY created_at DESC
+            LIMIT %d OFFSET %d",
+            $per_page,
+            $offset
+        ),
         ARRAY_A
     );
 
@@ -24,7 +36,14 @@ function advanced_ajax_crud_employee_list()
         return;
     }
 
-    wp_send_json_success($employees);
+    // wp_send_json_success($employees);
+    wp_send_json_success([
+        'employees'        => $employees,
+        'total'       => $total,
+        'per_page'    => $per_page,
+        'current'     => $page,
+        'total_pages' => ceil($total / $per_page)
+    ]);
 }
 
 // * Add/Edit (Insert/Update Employee Data)
